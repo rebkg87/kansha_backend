@@ -24,6 +24,9 @@ public class User implements UserDetails {
     @Column(length = 100, nullable = false)
     private  String password;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Gratitude> gratitudes;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -80,5 +83,13 @@ public class User implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Gratitude> getGratitudes() {
+        return gratitudes;
+    }
+
+    public void setGratitudes(List<Gratitude> gratitudes) {
+        this.gratitudes = gratitudes;
     }
 }
