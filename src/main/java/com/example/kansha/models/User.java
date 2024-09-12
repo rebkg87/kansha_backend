@@ -1,5 +1,6 @@
 package com.example.kansha.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +24,10 @@ public class User implements UserDetails {
 
     @Column(length = 100, nullable = false)
     private  String password;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Gratitude> gratitudes;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -80,5 +85,13 @@ public class User implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Gratitude> getGratitudes() {
+        return gratitudes;
+    }
+
+    public void setGratitudes(List<Gratitude> gratitudes) {
+        this.gratitudes = gratitudes;
     }
 }
