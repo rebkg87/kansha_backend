@@ -6,6 +6,7 @@ import com.example.kansha.repositories.GratitudeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,16 +20,16 @@ public class GratitudeService {
         return gratitudeRepository.save(gratitude);
     }
 
-    public Optional<Gratitude> findGratitudeById(Integer id) {
-        return gratitudeRepository.findById(id);
+    public List<Gratitude> findGratitudesByText(String text) {
+        return gratitudeRepository.findByGratitudeText(text);
     }
 
-    public List<Gratitude> findGratitudesByText(String gratitudeText) {
-        return gratitudeRepository.findByGratitudeText(gratitudeText);
+    public List<Gratitude> findAllGratitudesByUser(User id) {
+        return gratitudeRepository.findByUser(id);
     }
 
-    public List<Gratitude> findGratitudesByUser(User user) {
-        return gratitudeRepository.findByUser(user);
+    public Optional<Gratitude> findGratitudeByIdAndUser(Integer id, User user) {
+        return gratitudeRepository.findByIdAndUser(id, user);
     }
 
     public void deleteGratitude(Integer id) {
@@ -45,5 +46,11 @@ public class GratitudeService {
         } else {
             throw new RuntimeException("Gratitude not found with ID: " + gratitude.getId());
         }
+    }
+
+    public List<Gratitude> allGratitudes() {
+        List<Gratitude> gratitudes = new ArrayList<>();
+        gratitudeRepository.findAll().forEach(gratitudes::add);
+        return gratitudes;
     }
 }

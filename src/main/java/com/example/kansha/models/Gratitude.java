@@ -1,5 +1,6 @@
 package com.example.kansha.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -14,6 +15,7 @@ public class Gratitude {
     private Integer id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -23,6 +25,9 @@ public class Gratitude {
 
     @Column(name = "gratitude_text", columnDefinition = "TEXT")
     private String gratitudeText;
+
+    public Gratitude() {
+    }
 
     public Gratitude(User user, Date gratitudeDate, String gratitudeText, Integer id) {
         this.user = user;
