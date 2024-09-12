@@ -1,6 +1,5 @@
 package com.example.kansha.config;
 
-import com.example.kansha.models.User;
 import com.example.kansha.repositories.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

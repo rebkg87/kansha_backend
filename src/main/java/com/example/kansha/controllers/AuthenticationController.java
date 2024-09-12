@@ -21,12 +21,14 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping("/signup")
     public ResponseEntity<User> register (@RequestBody RegisterUserDto registerUserDto){
         User registeredUser = authenticationService.signup(registerUserDto);
         return ResponseEntity.ok(registeredUser);
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto){
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
