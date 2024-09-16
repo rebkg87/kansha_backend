@@ -24,4 +24,13 @@ public class UserMoodService {
         return  userMoodRepository.findByUserAndMood(user, mood);
     }
 
+    public UserMood createNewUserMood (User user, Mood mood, Date moodDate){
+        UserMood userMood = new UserMood();
+        userMood.setUser(user);
+        userMood.setMood(mood);
+        userMood.setMoodDate(moodDate);
+
+        return userMoodRepository.save(userMood);
+    }
+
 }
