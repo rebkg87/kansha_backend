@@ -11,7 +11,6 @@ public class MoodService {
     @Autowired
     private MoodRepository moodRepository;
 
-    public Mood createNewMood (Mood mood) { return moodRepository.save(mood); }
-
+    public Mood findByName(String name) { return moodRepository.findByName(name); }
 
 }
