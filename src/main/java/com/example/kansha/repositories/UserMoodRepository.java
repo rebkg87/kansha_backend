@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface UserMoodRepository extends JpaRepository {
+public interface UserMoodRepository extends JpaRepository<UserMood, Integer>{
     List<UserMood>findByUserAndMoodDate(User user, Date moodDate);
     List<UserMood>findByUserAndMood(User user, Mood mood);
 }
