@@ -2,6 +2,10 @@ package com.example.kansha.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -10,7 +14,11 @@ import java.util.List;
 
 @Table(name= "users" )
 @Entity
-public class User implements UserDetails {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
@@ -58,24 +66,12 @@ public class User implements UserDetails {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     @Override
@@ -83,15 +79,8 @@ public class User implements UserDetails {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public List<Gratitude> getGratitudes() {
         return gratitudes;
     }
 
-    public void setGratitudes(List<Gratitude> gratitudes) {
-        this.gratitudes = gratitudes;
-    }
 }
