@@ -37,13 +37,16 @@ public class SecurityConfiguration {
                         .disable())
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/auth/**")
+                        .authenticated()
+                        .requestMatchers("/login/oauth2/code/google")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-                .sessionManagement(management -> management
+                        .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(withDefaults());
 
         return http.build();
     }
