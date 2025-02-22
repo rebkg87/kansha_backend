@@ -2,7 +2,7 @@ package com.example.kansha.services;
 
 import com.example.kansha.dtos.LoginUserDto;
 import com.example.kansha.dtos.RegisterUserDto;
-import com.example.kansha.dtos.UserResponse;
+import com.example.kansha.dtos.UserResponseDto;
 import com.example.kansha.models.User;
 import com.example.kansha.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,38 +21,50 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
-    public User signup(RegisterUserDto input) {
-        User user = new User();
-                user.setName(input.getName());
-                user.setEmail(input.getEmail());
-                user.setPassword(passwordEncoder.encode(input.getPassword()));
+    public UserResponseDto signup(RegisterUserDto registerUserDto) {
+        userRepository.findByEmail(registerUserDto.getEmail())
+                .ifPresent(user -> {
+                    throw new RuntimeException("El email ya está registrado");
+                });
+        User newUser = User.builder()
+                .name(registerUserDto.getName())
+                .email(registerUserDto.getEmail())
+                .password(passwordEncoder.encode(registerUserDto.getPassword()))
+                .provider("local")
+                .build();
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(newUser);
+
+        String jwtToken = jwtService.generateToken(savedUser);
+
+        return UserResponseDto.builder()
+                .id(savedUser.getId())
+                .name(savedUser.getName())
+                .email(savedUser.getEmail())
+                .provider(savedUser.getProvider())
+                .token(jwtToken)
+                .build();
     }
 
-    public User authenticate (LoginUserDto input){
+    public UserResponseDto authenticate (LoginUserDto loginUserDto){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        input.getEmail(),
-                        input.getPassword()
+                        loginUserDto.getEmail(),
+                        loginUserDto.getPassword()
                 )
         );
 
-        return userRepository.findByEmail(input.getEmail())
-                .orElseThrow();
-    }
+        User user = userRepository.findByEmail(loginUserDto.getEmail())
+                .orElseThrow(()-> new RuntimeException("Usuario no encontradp"));
 
-    public UserResponse saveOrUpdateUser(Map<String, Object> userAtrributes){
-        String email = (String) userAtrributes.get("email");
-        User user = userRepository.findByEmail(email).orElse(new User());
+        String jwtToken = jwtService.generateToken(user);
 
-        user.setName((String) userAtrributes.get("name"));
-        user.setEmail(email);
-
-        user = userRepository.save(user);
-
-        String token =  jwtService.generateToken(user);
-        return new UserResponse(user.getName(), user.getEmail(), token);
-
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .provider(user.getProvider())
+                .token(jwtToken)
+                .build();
     }
 }

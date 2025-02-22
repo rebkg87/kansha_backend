@@ -22,30 +22,24 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<User> authenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        User currentUser = (User) authentication.getPrincipal();
-
+    public ResponseEntity<User> authenticatedUser(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(currentUser);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<User>> allUsers() {
-        List <User> users = userService.allUsers();
-
-        return ResponseEntity.ok(users);
-    }
-
     @GetMapping("/user")
-    public ResponseEntity<Optional<User>> getUserByEmail (
+    public ResponseEntity<User> getUserByEmail (
         @AuthenticationPrincipal User user ){
-            Optional<User> userOptional = userService.findByEmail(user.getEmail());
-        return ResponseEntity.ok(userOptional);
+        return userService.findByEmail(user.getEmail())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/home")
-    public ResponseEntity<Map<String, String>> home() {
-        return ResponseEntity.ok(Map.of("status", "User is authenticated", "message", "Welcome home"));
+    public ResponseEntity<Map<String, String>> userHome(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(Map.of(
+                "status", "Authenticated",
+                "message", "Welcome " + currentUser.getName()
+        ));
     }
+
 }

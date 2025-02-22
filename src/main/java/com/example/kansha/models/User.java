@@ -2,10 +2,7 @@ package com.example.kansha.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,10 +11,10 @@ import java.util.List;
 
 @Table(name= "users" )
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,7 +28,11 @@ public class User extends BaseEntity implements UserDetails {
     private String email;
 
     @Column(length = 100, nullable = false)
+    @JsonIgnore
     private  String password;
+
+    @Column(length = 50)
+    private String provider;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
@@ -60,27 +61,6 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public boolean isEnabled(){
         return true;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    public List<Gratitude> getGratitudes() {
-        return gratitudes;
     }
 
 }
