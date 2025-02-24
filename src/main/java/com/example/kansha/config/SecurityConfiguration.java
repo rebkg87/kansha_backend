@@ -1,5 +1,7 @@
 package com.example.kansha.config;
 
+import com.example.kansha.models.User;
+import com.example.kansha.repositories.UserRepository;
 import com.example.kansha.services.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -10,11 +12,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -26,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +33,7 @@ public class SecurityConfiguration {
     private final JwtService jwtService;
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -56,13 +55,26 @@ public class SecurityConfiguration {
                 // OAuth2 Login con Google
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler((request, response, authentication) -> {
-                            org.springframework.security.core.userdetails.User oauthUser =
-                                    (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+                            DefaultOAuth2User oauthUser = (DefaultOAuth2User) authentication.getPrincipal();
+
+                            String email = oauthUser.getAttribute("email");
+                            String name = oauthUser.getAttribute("name");
+
+                            User existingUser = userRepository.findByEmail(email)
+                                    .orElseGet(() -> {
+                                        User newUser = User.builder()
+                                                .email(email)
+                                                .name(name)
+                                                .provider("google")
+                                                .password("")
+                                                .build();
+                                        return userRepository.save(newUser);
+                                    });
 
                             Map<String, Object> extraClaims = new HashMap<>();
                             extraClaims.put("provider", "google");
 
-                            String token = jwtService.generateToken(extraClaims, oauthUser);
+                            String token = jwtService.generateToken(extraClaims, existingUser);
 
                             response.sendRedirect("http://localhost:5173/oauth2/redirect?token=" + token);
                         })
